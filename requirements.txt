@@ -1,0 +1,7 @@
+tornado
+pymongo
+motor
+dictshield
+requests
+PyJWT
+python-memcached
