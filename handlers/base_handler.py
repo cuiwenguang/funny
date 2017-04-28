@@ -2,6 +2,7 @@
 
 from tornado.web import RequestHandler, HTTPError
 
+from utils.auth import jwtauth
 from utils.http import HttpCode
 from utils.serialize import to_json
 
@@ -40,7 +41,7 @@ class BaseHandler(RequestHandler):
         }
         self.write(to_json(result))
 
-
+    @jwtauth
     def get(self, *args, **kwargs):
         '''
         默认的get处理方式，作为所有个头操作根据规则路由到相应的方法中
@@ -51,7 +52,7 @@ class BaseHandler(RequestHandler):
         f = self._get_func('get', *args, **kwargs)
         f(*args, **kwargs)
 
-
+    @jwtauth
     def post(self, *args, **kwargs):
         '''
         默认的post 操作,分发给相应的处理函数
@@ -62,6 +63,7 @@ class BaseHandler(RequestHandler):
         f = self._get_func('post', *args, **kwargs)
         f(*args, **kwargs)
 
+    @jwtauth
     def delete(self, *args, **kwargs):
         '''
         默认的delete 操作,分发给相应的处理函数

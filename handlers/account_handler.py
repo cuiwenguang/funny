@@ -1,37 +1,32 @@
 import json
 from tornado.web import HTTPError
-from tornado.web import RequestHandler
 
+from base_handler import BaseHandler
 from utils.http import HttpCode
-from models.user import UserModel,create_user, login
-class LoginHandler(RequestHandler):
+from models.user import create_user, login
+
+class LoginHandler(BaseHandler):
     def post(self, *args, **kwargs):
-        username = self.get_arguments("username")
-        password = self.get_arguments("password")
+        json_data = json.loads(self.request.body)
+        username = json_data.get("username", "")
+        password = json_data.get("password", "")
         user =login(username, password)
         if user is None:
-            r = {
-                "state": HttpCode.HTTP_UNAUTHORIZED,
-                "data": None,
-                "msg": "Incorrect username or password"
-            }
+            self.create_response(state=HttpCode.HTTP_UNAUTHORIZED,
+                                 message="Incorrect username or password")
         else:
-            r = {
-                "state": HttpCode.HTTP_SUCCESS,
-                "data": user,
-                "msg": ""
-            }
-        self.write(json.dumps(r))
+            self.create_response(data=user)
 
-class RegisterHander(RequestHandler):
+class RegisterHander(BaseHandler):
     def post(self, *args, **kwargs):
-        email = self.get_argument("email", "")
-        password = self.get_argument("password", "")
-        username = self.get_argument("username", email)
+        json_data = json.loads(self.request.body)
+        email = json_data.get("email", "")
+        password = json_data.get("password", "")
+        username = json_data.get("username", email)
         if email == "" or password == "":
             raise HTTPError(HttpCode.HTTP_BAD_REQUEST)
-        id = create_user(username=username,email=email,password=password)
-        self.write(json.dumps({
-            "sate": HttpCode.HTTP_SUCCESS,
-            "data": id,
-        }))
+        try:
+            token = create_user(username=username,email=email,password=password)
+            self.create_response(data=token)
+        except Exception, ex:
+             self.create_response(state=HttpCode.HTTP_BAD_REQUEST,message=ex.message)

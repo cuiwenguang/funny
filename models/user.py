@@ -8,8 +8,6 @@ from utils.auth import token_encode
 from data.db import mongo,users
 from conf.settings import SECRET_KEY
 
-class AccountError(Exception):
-    pass
 
 class UserModel(Document):
     username = StringField(max_length=50)
@@ -28,7 +26,7 @@ def create_user(username, email, password=None):
     user = UserModel(username=username, email=email)
     result = users.find_one({"$or": [{"username": username}, {"emial": username}]})
     if result is not None:
-        raise AccountError
+        raise Exception("username or email is exits")
     if password is not None:
         user.password = make_pwd(pwd=password)
     id = users.insert(user.to_python())

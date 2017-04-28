@@ -13,7 +13,7 @@ options = {
 }
 
 
-def jwtauth(handler_class):
+def jwtauth(handler_execute):
     ''' jwt装饰器 '''
     def wrap_execute(handler_execute):
         def require_auth(handler, kwargs):
@@ -69,8 +69,7 @@ def jwtauth(handler_class):
 
         return _execute
 
-    handler_class._execute = wrap_execute(handler_class._execute)
-    return handler_class
+    return handler_execute
 
 def token_encode(id, seconds=3600):
     # jwt 荷载
@@ -84,7 +83,7 @@ def token_encode(id, seconds=3600):
         "nbf": current_time,
         "jti": id
     }
-    return jwt.encode(payload,SECRET_KEY, algorithm='HS256')
+    return jwt.encode(payload, SECRET_KEY, algorithm='HS256')
 
 def token_decode(token):
     return jwt.decode(token, SECRET_KEY, algorithms=['HS256'])
