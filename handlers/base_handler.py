@@ -3,8 +3,10 @@
 from tornado.web import RequestHandler, HTTPError
 
 import utils.token
+from utils.filter.auth import authenticated
 from utils.http import HttpCode
 from utils.serialize import to_json
+from models.user import get_user
 
 class BaseHandler(RequestHandler):
     def __init__(self, application, request, **kwargs):
@@ -31,11 +33,24 @@ class BaseHandler(RequestHandler):
             self.finish()
         try:
             data = utils.token.token_decode(arr[1])
-            return {"id":data["jti"]}
-        except:
+            user = get_user(data["jti"])
+            if user:
+                return user
+            else:
+                raise
+        except Exception,ex:
+            print ex.message
             self.set_status(HttpCode.HTTP_UNAUTHORIZED)
             self.write("Missing authorization")
             self.finish()
+
+    def get_user_abs(self):
+        '''获取用户摘要信息'''
+        return {
+            "id": str(self.current_user["_id"]),
+            "usename": self.current_user["username"],
+            "avatar": self.current_user["avatar"]
+        }
 
     def access_control_allow(self):
         # 允许 JS 跨域调用
@@ -52,8 +67,9 @@ class BaseHandler(RequestHandler):
             "msg": message
         }
         self.write(to_json(result))
+        self.finish()
 
-
+    @authenticated
     def get(self, *args, **kwargs):
         '''
         默认的get处理方式，作为所有个头操作根据规则路由到相应的方法中
@@ -64,7 +80,7 @@ class BaseHandler(RequestHandler):
         f = self._get_func('get', *args, **kwargs)
         f(*args, **kwargs)
 
-
+    @authenticated
     def post(self, *args, **kwargs):
         '''
         默认的post 操作,分发给相应的处理函数
@@ -75,6 +91,7 @@ class BaseHandler(RequestHandler):
         f = self._get_func('post', *args, **kwargs)
         f(*args, **kwargs)
 
+    @authenticated
     def delete(self, *args, **kwargs):
         '''
         默认的delete 操作,分发给相应的处理函数

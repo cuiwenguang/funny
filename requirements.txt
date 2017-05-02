@@ -4,4 +4,5 @@ motor
 dictshield
 requests
 PyJWT
-python-memcached
+uuid
+redis

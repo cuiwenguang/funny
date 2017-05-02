@@ -8,36 +8,58 @@ import models.article
 
 class ArticleHandler(BaseHandler):
     '''文章控制器'''
-    def get_article(self, *args, **kwargs):
+    def get_detail(self, *args, **kwargs):
         '''获取一篇文章'''
-        id = kwargs.get("id", "")
-        if id == "":
+        pk = kwargs.get("id", "")
+        if pk == "":
             self.create_response(state=HttpCode.HTTP_BAD_REQUEST, message="id is not null")
-        doc = models.article.get_article_by_id(id)
+        doc = models.article.get_article_by_id(pk)
         self.create_response(data=doc)
 
-    def delete_article(self, *args, **kwargs):
+
+    def delete_remove(self, *args, **kwargs):
         '''删除一篇文章'''
-        id = kwargs.get("id", "")
-        if id == "":
+        pk = kwargs.get("id", "")
+        if pk == "":
             self.create_response(state=HttpCode.HTTP_BAD_REQUEST,message="id is not null")
         try:
-            models.article.remove(id)
+            models.article.remove(pk)
             self.create_response(message="success")
         except:
             self.create_response(state=HttpCode.HTTP_APPLICATION_ERROR)
 
+
     def post_create(self, *args, **kwargs):
-        '''保存一盘文章'''
+        '''保存文章'''
         json_data = json.loads(self.request.body)
-        article = models.article.save(**json_data)
-        pk = article.save()
+        pk = models.article.save(**json_data)
         self.create_response(data=pk)
 
-    def get_articles(self, *args, **kwargs):
-        '''获取某一频道的文章'''
+
+    def post_push(self, *args, **kwargs):
+        '''拉取文章'''
         pass
 
-    def post_list(self, *args, **kwargs):
-        '''拉取文章'''
+
+    def post_vote(self, *args, **kwargs):
+        pk = kwargs.get("id")
+        json_data = json.loads(self.request.body)
+        type = json_data.get("type", "1")
+        try:
+            models.article.vote(pk, type)
+        except Exception, ex:
+            return self.create_response(state=HttpCode.HTTP_APPLICATION_ERROR, message=ex.message)
+
+
+    def post_collect(self, *args, **kwargs):
+        pk = kwargs.get("id")
+        userid = self.current_user["id"]
+        try:
+            models.article.collect(userid, pk)
+            return self.create_response()
+        except Exception, ex:
+            return self.create_response(state=HttpCode.HTTP_APPLICATION_ERROR, message=ex.message)
+
+
+    def post_comment(self, *args, **kwargs):
         pass
