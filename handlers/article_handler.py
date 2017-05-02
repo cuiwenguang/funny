@@ -21,7 +21,8 @@ class ArticleHandler(BaseHandler):
         '''删除一篇文章'''
         pk = kwargs.get("id", "")
         if pk == "":
-            self.create_response(state=HttpCode.HTTP_BAD_REQUEST,message="id is not null")
+            self.create_response(state=HttpCode.HTTP_BAD_REQUEST,
+                                 message="id is not null")
         try:
             models.article.remove(pk)
             self.create_response(message="success")
@@ -38,7 +39,8 @@ class ArticleHandler(BaseHandler):
 
     def post_push(self, *args, **kwargs):
         '''拉取文章'''
-        pass
+        channels = []
+
 
 
     def post_vote(self, *args, **kwargs):
@@ -48,7 +50,8 @@ class ArticleHandler(BaseHandler):
         try:
             models.article.vote(pk, type)
         except Exception, ex:
-            return self.create_response(state=HttpCode.HTTP_APPLICATION_ERROR, message=ex.message)
+            return self.create_response(state=HttpCode.HTTP_APPLICATION_ERROR,
+                                        message=ex.message)
 
 
     def post_collect(self, *args, **kwargs):
@@ -58,7 +61,8 @@ class ArticleHandler(BaseHandler):
             models.article.collect(userid, pk)
             return self.create_response()
         except Exception, ex:
-            return self.create_response(state=HttpCode.HTTP_APPLICATION_ERROR, message=ex.message)
+            return self.create_response(state=HttpCode.HTTP_APPLICATION_ERROR,
+                                        message=ex.message)
 
 
     def post_comment(self, *args, **kwargs):
