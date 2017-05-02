@@ -1,10 +1,2 @@
+# Created by .ignore support plugin (hsz.mobi)
 .idea/
-data
-*~
-*.pyc
-*.swp
-*.pot
-*.mo
-
-.DS_Store
-desktop.ini

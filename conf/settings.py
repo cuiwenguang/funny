@@ -13,3 +13,17 @@ mongo = {
 
 SECRET_KEY = "funny_secret_key_test"
 
+CHANNELS = [
+    {
+        "id": 1,
+        "name": "Joke",
+    },
+    {
+        "id": 2,
+        "name": "Memes"
+    },
+    {
+        "id": 3,
+        "name": "Vedio"
+    }
+]
